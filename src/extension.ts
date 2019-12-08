@@ -15,9 +15,6 @@ import {checkPrimaryDependenciesFile} from './core/core';
 import * as pythonVirtualenvVersionCheck from './local_modules/checks/virtualenv/pythonVersionCheck';
 import * as pythonPipenvVersionCheck from './local_modules/checks/pipenv/pythonVersionCheck';
 
-// Output View
-import {OutputView} from './local_modules/ui/outputView';
-
 const registeredCheckModules = [pythonVirtualenvVersionCheck, pythonPipenvVersionCheck];
 const CHECK_MODULES_ENABLED = false;
 
@@ -27,7 +24,6 @@ let API_KEY: string = ''
 let StatusBarItem: vscode.StatusBarItem;
 
 export function activate({ subscriptions }: vscode.ExtensionContext) {
-
 	console.log('Ochrona is running! ');
 
 	API_KEY = vscode.workspace.getConfiguration().get('conf.ochrona.apiKey') || '';
@@ -134,7 +130,39 @@ function updateView(potential_vulnerabilities: PotentialVulnerabilities.Potentia
 					file: string[]): void {
 	if ((potential_vulnerabilities && potential_vulnerabilities.length > 0) || (confirmed_vulnerabilities && confirmed_vulnerabilities.length > 0)) {
 		notify(potential_vulnerabilities, confirmed_vulnerabilities, file);
-		createWebView(file, potential_vulnerabilities, confirmed_vulnerabilities);
+		var outputChannel = vscode.window.createOutputChannel('Ochrona')
+		outputChannel.show()
+		outputChannel.appendLine('Ochrona Dependency Scan');
+		outputChannel.appendLine(`\nFiles Scanned: \n\t${file.join('\n\t')}` );
+		outputChannel.appendLine('Scan Time: \n\t' + Date());
+		if (confirmed_vulnerabilities.length > 0) {
+			outputChannel.appendLine(`\nDiscovered ${confirmed_vulnerabilities.length} confirmed vulnerabilities.\n`);
+			confirmed_vulnerabilities.forEach((vuln: any) => {
+				outputChannel.appendLine(`\tPackage Name - ${vuln.name}`);
+				outputChannel.appendLine(`\tInstalled Version - ${vuln.found_version}`);
+				outputChannel.appendLine(`\tCVE - ${vuln.cve_id || 'None'}`);
+				outputChannel.appendLine(`\tSeverity - ${vuln.ochrona_severity_score || 'Unknown'}`);
+				outputChannel.appendLine(`\tReason - ${vuln.reason || 'Unknown'}`);
+				outputChannel.appendLine(`\tDescription - ${vuln.description || 'Unknown'}`);
+				outputChannel.appendLine(`\tReferences - \n\t\t${vuln.references.join('\n\t\t')}`);
+				outputChannel.appendLine(`\t-------------------------------------------------------`);
+				outputChannel.appendLine(`\n`);
+			});
+		}
+		if (potential_vulnerabilities.length > 0) {
+			outputChannel.appendLine(`Discovered ${potential_vulnerabilities.length} potential vulnerabilities.`);
+			potential_vulnerabilities.forEach((vuln: any) => {
+				outputChannel.appendLine(`\tPackage Name - ${vuln.name}`);
+				outputChannel.appendLine(`\tInstalled Version - ${vuln.found_version}`);
+				outputChannel.appendLine(`\tCVE - ${vuln.cve_id || 'None'}`);
+				outputChannel.appendLine(`\tSeverity - ${vuln.ochrona_severity_score || 'Unknown'}`);
+				outputChannel.appendLine(`\tReason - ${vuln.reason || 'Unknown'}`);
+				outputChannel.appendLine(`\tDescription - ${vuln.description || 'Unknown'}`);
+				outputChannel.appendLine(`\tReferences - \n\t\t${vuln.references.join('\n\t\t')}`);
+				outputChannel.appendLine(`\t-------------------------------------------------------`);
+				outputChannel.appendLine(`\n`);
+			});
+		}
 	}
 	updateStatusBarItem(potential_vulnerabilities.concat(confirmed_vulnerabilities).length);
 }
@@ -146,15 +174,6 @@ function statusBarUpdating(): void {
 	StatusBarItem.hide();
 	StatusBarItem.text = `$(sync~spin) Checking for python vulnerabilities..`
 	StatusBarItem.show();
-}
-
-//
-// Generates new WebView of scan output
-//
-function createWebView(paths: string[], 
-						potential_vulnerabilities: PotentialVulnerabilities.PotentialVulnerability[],
-						confirmed_vulnerabilities: PotentialVulnerabilities.PotentialVulnerability[]): void {
-	OutputView.createOrShow(paths, potential_vulnerabilities, confirmed_vulnerabilities);
 }
 
 // this method is called when your extension is deactivated

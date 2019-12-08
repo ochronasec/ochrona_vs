@@ -1,18 +1,20 @@
+// Ochrona Security 2019
+// ascott
 import * as vscode from 'vscode';
 import fs = require('fs');
 import semver = require('semver');
 
 // Custom Types
-import * as ModuleCheck from '../../models/ModuleCheckResult';
+import * as ModuleCheck from '../../../models/ModuleCheckResult';
 
 // util
-import * as exec from '../utils/execUtil';
+import * as exec from '../../utils/execUtil';
 
 const MINIMUM_VERSION = '3.5.0';
 const VERSION_PATTERN = /\/python(\d\.\d+)$/;
 
 export async function check() {
-    console.log('Python version check is running');
+    console.log('Python virtualenv version check is running');
     let lessThanMinimumVersionDetected: ModuleCheck.ModuleCheckResult = {
         violated: false
     }

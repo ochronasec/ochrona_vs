@@ -14,6 +14,19 @@
 	],
 	"main": "./out/extension.js",
 	"contributes": {
+		"configuration": [
+			{
+				"title": "Ochrona",
+				"properties": {
+					"conf.ochrona.apiKey": {
+						"type": "string",
+						"default": "xxxx",
+						"description": "API Key for Ochrona Python Dependency Analysis tool. You can get register for an API key at https://ochrona.dev",
+						"scope": "user"
+					}
+				}
+			}
+		],
 		"commands": [
 			{
 				"command": "extension.ochrona",

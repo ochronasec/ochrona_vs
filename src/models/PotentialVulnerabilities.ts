@@ -3,7 +3,7 @@ export interface PotentialVulnerability {
     vulnerabilities: Vulnerability[]
 }
 
-interface Vulnerability {
+export interface Vulnerability {
     name?: string,
     language?: string,
     description?: string,

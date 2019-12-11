@@ -3,12 +3,25 @@
 	"displayName": "Ochrona",
 	"description": "Ochrona is a open-source dependency management tool.",
 	"version": "0.0.1",
+	"icon": "resources/ochrona_logo.png",
+	"publisher": "ochrona",
 	"engines": {
 		"vscode": "^1.36.0"
 	},
+	"galleryBanner": {
+        "color": "#1C7EBF"
+    },
 	"categories": [
-		"Other"
+		"Programming Languages"
 	],
+	"keywords": [
+        "ochrona",
+        "security",
+        "vulnerability",
+        "python",
+        "pip",
+        "devsecops"
+    ],
 	"activationEvents": [
 		"onCommand:extension.ochrona"
 	],
@@ -57,5 +70,10 @@
 		"@types/semver": "^6.0.1",
 		"request": "^2.88.0",
 		"semver": "^6.3.0"
-	}
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/ochronasec/ochrona_vs.git"
+	  },
+	  "homepage": "https://github.com/ochronasec/ochrona_vs/blob/master/README.md"
 }

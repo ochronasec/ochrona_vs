@@ -1,6 +1,5 @@
 # Change Log
 
-## [Unreleased]
+## [0.0.1]
 
-- Support for checking `*requirement*.txt` files for known python vulnerabilities.
-- Added Check for python 3.5.0 and above.
+- Support for checking `*requirement*.txt` and `Pipfile.lock` files for known python vulnerabilities.

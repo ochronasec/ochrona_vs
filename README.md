@@ -1,8 +1,8 @@
 # Ochrona
 
-Ochrona is an easy to use Dependency Analysis tool for python designed to shift security as far left as possible (into your IDE).
+Ochrona is an easy to use Dependency Analysis tool for python designed to catch python dependency vulnerabilities before you commit. Ochrona has a free-tier license which allows 25 scans per month.
 
-Read more at [Ochrona.dev](https://ochrona.dev)
+Learn more at [Ochrona.dev](https://ochrona.dev)
 
 ## Usage
 

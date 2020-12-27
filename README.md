@@ -1,6 +1,8 @@
 # Ochrona
 
-Ochrona is an easy to use Dependency Analysis tool for python designed to catch python dependency vulnerabilities before you commit. Ochrona has a free-tier license which allows 25 scans per month.
+This plugin is designed to operate as part of Ochrona Security, a solution for validating the dependencies used in python projects.
+
+Ochrona requires a license to operate. We offer a free-tier license which allows up to 25 scans per month. You can sign up for an API key at https://ochrona.dev.
 
 Learn more at [Ochrona.dev](https://ochrona.dev)
 
@@ -38,6 +40,12 @@ To set this open the VS Code Settings (Code -> Preferences -> Settings) or (`CMD
 ![demo](resources/ochrona_vs.gif)
 
 ## Release Notes
+
+### 0.0.3
+- Added new invalid requirements.txt patterns.
+
+### 0.0.2
+- Updated for new Ochrona API.
 
 ### 0.0.1
 - Support for checking `*requirement*.txt` and `Pipfile.lock` files for known python vulnerabilities.

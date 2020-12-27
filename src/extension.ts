@@ -18,7 +18,7 @@ import * as pythonPipenvVersionCheck from './local_modules/checks/pipenv/pythonV
 const registeredCheckModules = [pythonVirtualenvVersionCheck, pythonPipenvVersionCheck];
 const CHECK_MODULES_ENABLED = false;
 
-const OCHRONA_ANALYSIS_URL = 'http://127.0.0.1:5000/python/analyze';
+const OCHRONA_ANALYSIS_URL = 'https://api.ochrona.dev/python/analyze';
 let API_KEY: string = ''
 
 let StatusBarItem: vscode.StatusBarItem;
@@ -51,11 +51,12 @@ function callApi(file: string[], parsed: string[]): any {
 		url: OCHRONA_ANALYSIS_URL,
 		headers: {
 			'Content-Type': 'application/json',
-			'Authorization': API_KEY
+			'x-api-key': API_KEY
 		},
 		body: JSON.stringify({'dependencies': parsed })
 	};
 	
+	console.log(`Making request to ${OCHRONA_ANALYSIS_URL}`);
 	request(options, function (err, res, body) {
 		if(err) {
 			console.log(err);
@@ -65,8 +66,9 @@ function callApi(file: string[], parsed: string[]): any {
 				let potentialVulnerabilities: PotentialVulnerabilities.PotentialVulnerability[] = parsed.potential_vulnerabilities || [];
 				let confirmedVulnerabilities: PotentialVulnerabilities.PotentialVulnerability[] = parsed.confirmed_vulnerabilities || [];
 				updateView(potentialVulnerabilities, confirmedVulnerabilities, file);
+			} else {
+				console.log(`Status Code: ${res.statusCode} Response: ${res.body}`);
 			}
-			
 		}
 	});
 }

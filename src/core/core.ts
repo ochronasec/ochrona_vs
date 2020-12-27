@@ -6,6 +6,20 @@ const fs = require('fs');
 
 const REQUIREMENTS_TXT = '*requirements*.txt';
 const PIPFILE_LOCK = '*Pipfile.lock';
+const INVALID_REQUIREMENTS_LINES = [
+    "#",
+    "-i",
+    "-f",
+    "-Z",
+    "--index-url",
+    "--extra-index-url",
+    "--find-links",
+    "--no-index",
+    "--allow-external",
+    "--allow-unverified",
+    "--always-unzip",
+    ""
+];
 
 async function findRequirementsTxt() {
     let files = await vscode.workspace.findFiles(REQUIREMENTS_TXT, null, 10);
@@ -26,7 +40,11 @@ async function findRequirementsTxt() {
 function parseRequirementsTxt(path: string): string[] {
     let parsed: string[] = [];
     fs.readFileSync(path, 'utf-8').split(/\r?\n/).forEach(function(line: string) {
-        parsed.push(line)
+        INVALID_REQUIREMENTS_LINES.forEach(pattern => {
+            if (!line.startsWith(pattern)) {
+                parsed.push(line);
+            }
+        });
     });
     return parsed;
 }
@@ -63,5 +81,6 @@ function toObj(path: string[], pkgs: string[]): any {
 export async function checkPrimaryDependenciesFile(callback: Function) {
     let pips: any = await findPipfileLock();
     let reqs: any = await findRequirementsTxt()
+    console.log(pips.pkgs, reqs.pkgs);
     callback(pips.path.concat(reqs.path), pips.pkgs.concat(reqs.pkgs))
 }

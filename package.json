@@ -1,27 +1,37 @@
 {
 	"name": "ochrona",
 	"displayName": "Ochrona",
-	"description": "Ochrona is a open-source dependency management tool.",
-	"version": "0.0.1",
+	"description": "Ochrona is a Software Composition Analysis tool.",
+	"version": "0.0.3",
 	"icon": "resources/ochrona_logo.png",
-	"publisher": "ochrona",
+	"publisher": "ochronasec",
+	"license": "See LICENSE.txt",
+	"author": {
+		"name": "ascott"
+	},
 	"engines": {
 		"vscode": "^1.36.0"
 	},
 	"galleryBanner": {
-        "color": "#1C7EBF"
-    },
+		"color": "#1C7EBF",
+		"theme": "dark"
+	},
 	"categories": [
-		"Programming Languages"
+		"Linters",
+		"Languages",
+		"Other"
 	],
 	"keywords": [
-        "ochrona",
-        "security",
-        "vulnerability",
-        "python",
-        "pip",
-        "devsecops"
-    ],
+		"ochrona",
+		"security",
+		"vulnerability",
+		"python",
+		"pip",
+		"devsecops",
+		"sca",
+		"dependency"
+	],
+	"preview": false,
 	"activationEvents": [
 		"onCommand:extension.ochrona"
 	],
@@ -74,6 +84,10 @@
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/ochronasec/ochrona_vs.git"
-	  },
-	  "homepage": "https://github.com/ochronasec/ochrona_vs/blob/master/README.md"
+	},
+	"bugs": {
+		"url": "https://github.com/ochronasec/ochrona_vs/issues",
+		"email": "support@ochrona.dev"
+	},
+	"homepage": "https://github.com/ochronasec/ochrona_vs/blob/master/README.md"
 }

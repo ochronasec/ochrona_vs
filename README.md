@@ -18,6 +18,7 @@ In the command palette (`CMD` + `SHIFT` + `P`), type `Ochrona`.
 Ochrona supports the following file types:
 - `*requirements*.txt`
 - `Pipfile.lock`
+- `poetry.lock`
 
 A warning is displayed if a vulnerability is discovered.
 ![vulns found alert](resources/found_vuln_warning.png)
@@ -40,6 +41,16 @@ To set this open the VS Code Settings (Code -> Preferences -> Settings) or (`CMD
 ![demo](resources/ochrona_vs.gif)
 
 ## Release Notes
+
+### 0.0.5
+
+- Added support for `poetry.lock` files.
+
+### 0.0.4
+
+- Fixed bug in requirements.txt file parsing.
+- Adding warning when API Key is missing.
+- Stop spinner if request fails.
 
 ### 0.0.3
 - Added new invalid requirements.txt patterns.

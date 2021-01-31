@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.0.5]
+
+- Added support for poetry.lock files
+
 ## [0.0.4]
 
 - Fixed bug in requirements.txt file parsing

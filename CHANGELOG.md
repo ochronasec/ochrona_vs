@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.0.6]
+
+- Short-circuit run if no files are found
+
 ## [0.0.5]
 
 - Added support for poetry.lock files

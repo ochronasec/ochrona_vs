@@ -44,6 +44,12 @@ export function activate({ subscriptions }: vscode.ExtensionContext) {
 //
 function callApi(file: string[], parsed: string[]): any {
 
+	if (parsed.length == 0 && file.length == 0) {
+		console.log("Did not find any matching files.");
+		updateStatusBarItem(0, false, true);
+		return;
+	}
+
 	const options = {
 		method: 'POST',
 		url: OCHRONA_ANALYSIS_URL,
@@ -93,11 +99,14 @@ function _notify(general_module_check: ModuleCheck.ModuleCheckResult) {
 //
 // Updates the status bar item when results arrive
 //
-function updateStatusBarItem(total_vulns: number, error: boolean = false): void {
+function updateStatusBarItem(total_vulns: number, error: boolean = false, empty: boolean = false): void {
 	if (error) {
 		StatusBarItem.text = `$(report) Ochrona reported an Error`;
 		StatusBarItem.show();
-	} else if (total_vulns > 0) {
+	} else if (empty) {
+		StatusBarItem.text = `$(report) Ochrona could not locate dependency files`;
+		StatusBarItem.show();
+	}else if (total_vulns > 0) {
 		StatusBarItem.text = `$(report) ${total_vulns} python vulnerabilites found!`;
 		StatusBarItem.show();
 	} else {

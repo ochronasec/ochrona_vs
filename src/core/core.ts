@@ -7,9 +7,9 @@ import * as FileTypes from '../models/FileTypes';
 const fs = require('fs');
 const toml = require('toml');
 
-const REQUIREMENTS_TXT = '*requirements*.txt';
-const PIPFILE_LOCK = '*Pipfile.lock';
-const POETRY_LOCK = '*poetry.lock';
+const REQUIREMENTS_TXT = '**/*requirements*.txt';
+const PIPFILE_LOCK = '**/*Pipfile.lock';
+const POETRY_LOCK = '**/*poetry.lock';
 const INVALID_REQUIREMENTS_LINES = [
     "#",
     "-i",

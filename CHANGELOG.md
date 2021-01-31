@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.0.4]
+
+- Fixed bug in requirements.txt file parsing
+- Adding warning when API Key is missing
+- Stop spinner if request fails
+
 ## [0.0.3]
 
 - Added new invalid requirements.txt patterns.

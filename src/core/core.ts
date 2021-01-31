@@ -18,7 +18,6 @@ const INVALID_REQUIREMENTS_LINES = [
     "--allow-external",
     "--allow-unverified",
     "--always-unzip",
-    ""
 ];
 
 async function findRequirementsTxt() {
@@ -40,11 +39,12 @@ async function findRequirementsTxt() {
 function parseRequirementsTxt(path: string): string[] {
     let parsed: string[] = [];
     fs.readFileSync(path, 'utf-8').split(/\r?\n/).forEach(function(line: string) {
-        INVALID_REQUIREMENTS_LINES.forEach(pattern => {
-            if (!line.startsWith(pattern)) {
+        for (let pattern of INVALID_REQUIREMENTS_LINES) {
+            if (!line.startsWith(pattern) && line != "") {
                 parsed.push(line);
+                break;
             }
-        });
+        }
     });
     return parsed;
 }
@@ -78,9 +78,14 @@ function toObj(path: string[], pkgs: string[]): any {
     };
 }
 
-export async function checkPrimaryDependenciesFile(callback: Function) {
-    let pips: any = await findPipfileLock();
-    let reqs: any = await findRequirementsTxt()
-    console.log(pips.pkgs, reqs.pkgs);
-    callback(pips.path.concat(reqs.path), pips.pkgs.concat(reqs.pkgs))
+export async function checkPrimaryDependenciesFile(callback: Function, err: Function) {
+    try {
+        let pips: any = await findPipfileLock();
+        let reqs: any = await findRequirementsTxt();
+        console.log(pips.pkgs, reqs.pkgs);
+        callback(pips.path.concat(reqs.path), pips.pkgs.concat(reqs.pkgs));
+    } catch (e) {
+        console.log(e);
+        err(0, true);
+    }
 }

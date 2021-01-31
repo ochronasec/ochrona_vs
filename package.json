@@ -2,10 +2,10 @@
 	"name": "ochrona",
 	"displayName": "Ochrona",
 	"description": "Ochrona is a Software Composition Analysis tool.",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"icon": "resources/ochrona_logo.png",
 	"publisher": "ochronasec",
-	"license": "See LICENSE.txt",
+	"license": "MIT",
 	"author": {
 		"name": "ascott"
 	},

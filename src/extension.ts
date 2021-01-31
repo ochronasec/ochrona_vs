@@ -26,8 +26,6 @@ let StatusBarItem: vscode.StatusBarItem;
 export function activate({ subscriptions }: vscode.ExtensionContext) {
 	console.log('Ochrona is running! ');
 
-	API_KEY = vscode.workspace.getConfiguration().get('conf.ochrona.apiKey') || '';
-
 	const commandID = 'extension.ochrona';
 	let disposable = vscode.commands.registerCommand(commandID, async () => {
 		StatusBarItem.tooltip = 'Ochrona VS Code plugin for python dependency management.'
@@ -68,6 +66,7 @@ function callApi(file: string[], parsed: string[]): any {
 				updateView(potentialVulnerabilities, confirmedVulnerabilities, file);
 			} else {
 				console.log(`Status Code: ${res.statusCode} Response: ${res.body}`);
+				updateStatusBarItem(0, true);
 			}
 		}
 	});
@@ -94,8 +93,11 @@ function _notify(general_module_check: ModuleCheck.ModuleCheckResult) {
 //
 // Updates the status bar item when results arrive
 //
-function updateStatusBarItem(total_vulns: number): void {
-	if (total_vulns > 0) {
+function updateStatusBarItem(total_vulns: number, error: boolean = false): void {
+	if (error) {
+		StatusBarItem.text = `$(report) Ochrona reported an Error`;
+		StatusBarItem.show();
+	} else if (total_vulns > 0) {
 		StatusBarItem.text = `$(report) ${total_vulns} python vulnerabilites found!`;
 		StatusBarItem.show();
 	} else {
@@ -108,10 +110,19 @@ function updateStatusBarItem(total_vulns: number): void {
 // Main method, sets the status to updating and calls the remote API for any found files
 //
 async function checkForUpdates() {
+
+	// ensure API key is configured
+	API_KEY = vscode.workspace.getConfiguration().get('conf.ochrona.apiKey') || '';
+	if (API_KEY == '') {
+		vscode.window.showWarningMessage(
+			'API Key has not been configured for Ochrona. Please provide an API key in Settings.'
+		);
+		return;
+	}
 	statusBarUpdating();
 
 	// vuln checks
-	checkPrimaryDependenciesFile(callApi);
+	checkPrimaryDependenciesFile(callApi, updateStatusBarItem);
 
 	// other module checks
 	if (CHECK_MODULES_ENABLED) {

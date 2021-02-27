@@ -5,6 +5,7 @@ import * as FileTypes from '../models/FileTypes';
 
 
 const fs = require('fs');
+const path = require('path');
 const toml = require('toml');
 
 const REQUIREMENTS_TXT = '**/*requirements*.txt';
@@ -31,9 +32,10 @@ async function findRequirementsTxt() {
 	if (files.length > 0) {
 		files.forEach( async function(file) {
 			if (file.path) {
-                console.log(`Found requirements.txt type file at ${file.path}`);
-                paths.push(file.path);
-                findings = findings.concat(parseRequirementsTxt(file.path))
+                let normalized_path = path.normalize(file.path);
+                console.log(`Found requirements.txt type file at ${normalized_path}`);
+                paths.push(normalized_path);
+                findings = findings.concat(parseRequirementsTxt(normalized_path))
 			}
 		});
     };
@@ -60,9 +62,10 @@ async function findPipfileLock() {
 	if (files.length > 0) {
 		files.forEach( async function(file) {
 			if (file.path) {
-                console.log(`Found Pipfile.lock type file at ${file.path}`);
-                paths.push(file.path);
-                findings = findings.concat(parsePipfileLock(file.path))
+                let normalized_path = path.normalize(file.path);
+                console.log(`Found Pipfile.lock type file at ${normalized_path}`);
+                paths.push(normalized_path);
+                findings = findings.concat(parsePipfileLock(normalized_path))
 			}
 		});
     };
@@ -82,9 +85,10 @@ async function findPoetryLock() {
 	if (files.length > 0) {
 		files.forEach( async function(file) {
 			if (file.path) {
-                console.log(`Found poetry.lock type file at ${file.path}`);
-                paths.push(file.path);
-                findings = findings.concat(parsePoetryLock(file.path))
+                let normalized_path = path.normalize(file.path);
+                console.log(`Found poetry.lock type file at ${normalized_path}`);
+                paths.push(normalized_path);
+                findings = findings.concat(parsePoetryLock(normalized_path))
 			}
 		});
     };

@@ -42,6 +42,11 @@ To set this open the VS Code Settings (Code -> Preferences -> Settings) or (`CMD
 
 ## Release Notes
 
+### 0.1.0
+
+- Add support for new Authentication provider
+- Use path.normalize for windows path support
+
 ### 0.0.6
 
 - Short-circuit run if no files are found.

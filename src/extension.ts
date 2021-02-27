@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import * as request from 'request';
 import fs = require('fs');
+import jwt_decode from "jwt-decode";
 
 // Custom Types
 import * as PotentialVulnerabilities from './models/PotentialVulnerabilities';
@@ -19,7 +20,9 @@ const registeredCheckModules = [pythonVirtualenvVersionCheck, pythonPipenvVersio
 const CHECK_MODULES_ENABLED = false;
 
 const OCHRONA_ANALYSIS_URL = 'https://api.ochrona.dev/python/analyze';
+const OCHRONA_AUTH_URL = 'https://authn.ochrona.dev/oauth2/token';
 let API_KEY: string = ''
+let JWT: string = ''
 
 let StatusBarItem: vscode.StatusBarItem;
 
@@ -42,24 +45,26 @@ export function activate({ subscriptions }: vscode.ExtensionContext) {
 //
 // Makes a request to `OCHRONA_ANALYSIS_URL` for any found requirements files.
 //
-function callApi(file: string[], parsed: string[]): any {
+async function callApi(file: string[], parsed: string[]): Promise<any> {
 
+	// Pre-call checks
 	if (parsed.length == 0 && file.length == 0) {
 		console.log("Did not find any matching files.");
 		updateStatusBarItem(0, false, true);
 		return;
 	}
 
+	let jwt: string;
+	jwt = await getJwt(API_KEY);
 	const options = {
 		method: 'POST',
 		url: OCHRONA_ANALYSIS_URL,
 		headers: {
 			'Content-Type': 'application/json',
-			'x-api-key': API_KEY
+			'Authorization': jwt 
 		},
 		body: JSON.stringify({'dependencies': parsed })
 	};
-	
 	console.log(`Making request to ${OCHRONA_ANALYSIS_URL}`);
 	request(options, function (err, res, body) {
 		if(err) {
@@ -76,6 +81,61 @@ function callApi(file: string[], parsed: string[]): any {
 			}
 		}
 	});
+}
+
+//
+// Refreshed the global JWT
+//
+function getJwt(apiKey: string): Promise<string> {
+	return new Promise((resolve, reject) => {
+		if (isJwtExpired()) {
+			const options = {
+				method: 'POST',
+				url: OCHRONA_AUTH_URL,
+				headers: {"Content-Type": "application/x-www-form-urlencoded"},
+				form: {
+					grant_type: "refresh_token",
+					client_id: "2asm97h0jq5299qgpeeom91iod",
+					refresh_token: apiKey
+				}
+			};
+
+			console.log(`Making request to ${OCHRONA_AUTH_URL}`);
+			request(options, function (err, res, body) {
+				if(err) {
+					console.log(err);
+					reject(err)
+				} else {
+					if (res.statusCode == 200) {
+						let parsed = JSON.parse(body);
+						JWT = parsed.id_token;
+						resolve(JWT);
+					} else {
+						console.log(`Status Code: ${res.statusCode} Response: ${res.body}`);
+						reject(res.body);
+					}
+				}
+			});
+		} else {
+			resolve(JWT);
+		}
+	});
+}
+
+//
+// Checks if the JWT is expired
+//
+function isJwtExpired(): boolean {
+	if (!!JWT) {
+		let decoded: any = jwt_decode(JWT);
+		let now = Math.floor(Date.now() / 1000);
+		if (decoded.exp && now >= decoded.exp) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	return true;
 }
 
 //

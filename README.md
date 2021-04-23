@@ -2,9 +2,9 @@
 
 This plugin is designed to operate as part of Ochrona Security, a solution for validating the dependencies used in python projects.
 
-Ochrona requires a license to operate. We offer a free-tier license which allows up to 25 scans per month. You can sign up for an API key at https://ochrona.dev.
+Ochrona requires a license to operate. We offer a free-tier license which allows up to 25 scans per month. You can sign up for an API key at https://signup.ochrona.dev.
 
-Learn more at [Ochrona.dev](https://ochrona.dev)
+Learn more at [Ochrona.dev](https://ochrona.dev) or view our comprehensive [documentation portal](https://docs.ochrona.dev).
 
 ## Usage
 
@@ -13,12 +13,16 @@ This Extension adds the `Ochrona` command which will detect all known python dep
 In the command palette (`CMD` + `SHIFT` + `P`), type `Ochrona`.
 ![run ochrona](resources/command.png)
 
+By default `Ochrona` will also run when you modify and save any python dependency files (listed below).
+
 ## Features
 
 Ochrona supports the following file types:
 - `*requirements*.txt`
 - `Pipfile.lock`
 - `poetry.lock`
+- `tox.ini`
+- `environment.yml`
 
 A warning is displayed if a vulnerability is discovered.
 ![vulns found alert](resources/found_vuln_warning.png)
@@ -41,6 +45,15 @@ To set this open the VS Code Settings (Code -> Preferences -> Settings) or (`CMD
 ![demo](resources/ochrona_vs.gif)
 
 ## Release Notes
+
+## [0.2.1]
+- Documentation updates
+
+## [0.2.0]
+
+- Added support for scanning dependency files on file save.
+- Added support for `tox.ini` files.
+- Added support for `environment.yml` files.
 
 ### 0.1.0
 

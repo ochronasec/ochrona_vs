@@ -1,5 +1,14 @@
 # Change Log
 
+## [0.2.1]
+- Documentation updates
+
+## [0.2.0]
+
+- Add support for scanning dependency files on file save.
+- Added support for `tox.ini` files.
+- Added support for `environment.yml` files.
+
 ## [0.1.0]
 
 - Add support for new Authentication provider

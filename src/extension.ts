@@ -10,7 +10,7 @@ import * as PotentialVulnerabilities from './models/PotentialVulnerabilities';
 import * as ModuleCheck from './models/ModuleCheckResult'
 
 // Core
-import {checkPrimaryDependenciesFile} from './core/core';
+import {checkPrimaryDependenciesFile, checkExplicitDependencyFile, isApplicableFile} from './core/core';
 
 // Check Modules
 import * as pythonVirtualenvVersionCheck from './local_modules/checks/virtualenv/pythonVersionCheck';
@@ -27,16 +27,22 @@ let JWT: string = ''
 let StatusBarItem: vscode.StatusBarItem;
 
 export function activate({ subscriptions }: vscode.ExtensionContext) {
-	console.log('Ochrona is running! ');
+	vscode.workspace.onDidSaveTextDocument((document: vscode.TextDocument) => {
+		console.log(document.fileName);
+		if (isApplicableFile(document.fileName)) {
+			console.log(`Ochrona check for ${document.fileName}`);
+			checkForUpdatesExplicit(document.fileName);
+		}
+	});
 
 	const commandID = 'extension.ochrona';
 	let disposable = vscode.commands.registerCommand(commandID, async () => {
-		StatusBarItem.tooltip = 'Ochrona VS Code plugin for python dependency management.'
-
+		console.log("Ochrona check all files");
 		await checkForUpdates();
 	});
 
 	StatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+	StatusBarItem.tooltip = 'Ochrona VS Code plugin for python dependency management.'
 	StatusBarItem.command = commandID;
 	subscriptions.push(StatusBarItem);
 	subscriptions.push(disposable);
@@ -203,6 +209,36 @@ async function checkForUpdates() {
 		});
 	}
 }
+
+//
+// Explicit Check for a file
+//
+async function checkForUpdatesExplicit(file: string) {
+
+	// ensure API key is configured
+	API_KEY = vscode.workspace.getConfiguration().get('conf.ochrona.apiKey') || '';
+	if (API_KEY == '') {
+		vscode.window.showWarningMessage(
+			'API Key has not been configured for Ochrona. Please provide an API key in Settings.'
+		);
+		return;
+	}
+	statusBarUpdating();
+
+	// vuln checks
+	checkExplicitDependencyFile(file, callApi, updateStatusBarItem);
+
+	// other module checks
+	if (CHECK_MODULES_ENABLED) {
+		registeredCheckModules.forEach( async (module) => {
+			let checkResponse = await module.check()
+			if (checkResponse.violated) {
+				_notify(checkResponse)
+			}
+		});
+	}
+}
+
 
 //
 // Bundled method to update whole view (status bar item & warning message)

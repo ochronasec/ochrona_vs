@@ -8,6 +8,7 @@ import jwt_decode from "jwt-decode";
 // Custom Types
 import * as PotentialVulnerabilities from './models/PotentialVulnerabilities';
 import * as ModuleCheck from './models/ModuleCheckResult'
+import * as PolicyViolations from './models/PolicyViolations'
 
 // Core
 import {checkPrimaryDependenciesFile, checkExplicitDependencyFile, isApplicableFile} from './core/core';
@@ -80,7 +81,8 @@ async function callApi(file: string[], parsed: string[]): Promise<any> {
 				let parsed = JSON.parse(body);
 				let potentialVulnerabilities: PotentialVulnerabilities.PotentialVulnerability[] = parsed.potential_vulnerabilities || [];
 				let confirmedVulnerabilities: PotentialVulnerabilities.PotentialVulnerability[] = parsed.confirmed_vulnerabilities || [];
-				updateView(potentialVulnerabilities, confirmedVulnerabilities, file);
+				let policyViolations: PolicyViolations.PolicyViolation[] = parsed.policy_violations || [];
+				updateView(potentialVulnerabilities, confirmedVulnerabilities, policyViolations, file);
 			} else {
 				console.log(`Status Code: ${res.statusCode} Response: ${res.body}`);
 				updateStatusBarItem(0, true);
@@ -147,18 +149,27 @@ function isJwtExpired(): boolean {
 //
 // Pushes an Warning message to use the user when dependency vulnerabilities are found
 //
-function notify(potential_vulnerabilities: PotentialVulnerabilities.PotentialVulnerability[], 
+function notifyVuln(potential_vulnerabilities: PotentialVulnerabilities.PotentialVulnerability[], 
 				confirmed_vulnerabilities: PotentialVulnerabilities.PotentialVulnerability[],
 				file: string[]) {
         vscode.window.showWarningMessage(
-			`Found ${confirmed_vulnerabilities.length} confirmed vulnerabilities and ${potential_vulnerabilities.length} potential vulnerabilities in ${file}`
+			`Found ${confirmed_vulnerabilities.length} confirmed vulnerabilities in ${file}`
         );
+}
+
+//
+// Pushes an Warning message to use the user when policy violations are found
+//
+function notifyPolicy(violations: PolicyViolations.PolicyViolation[], file: string[]) {
+	vscode.window.showWarningMessage(
+	`Found ${violations.length} policy violations in ${file}`
+	);
 }
 
 //
 // Pushes an Warning message to use the user when module vulnerabilities are found
 //
-function _notify(general_module_check: ModuleCheck.ModuleCheckResult) {
+function notifyModule(general_module_check: ModuleCheck.ModuleCheckResult) {
 	vscode.window.showWarningMessage(general_module_check.value!.message!);
 }
 
@@ -204,7 +215,7 @@ async function checkForUpdates() {
 		registeredCheckModules.forEach( async (module) => {
 			let checkResponse = await module.check()
 			if (checkResponse.violated) {
-				_notify(checkResponse)
+				notifyModule(checkResponse)
 			}
 		});
 	}
@@ -233,7 +244,7 @@ async function checkForUpdatesExplicit(file: string) {
 		registeredCheckModules.forEach( async (module) => {
 			let checkResponse = await module.check()
 			if (checkResponse.violated) {
-				_notify(checkResponse)
+				notifyModule(checkResponse)
 			}
 		});
 	}
@@ -245,14 +256,15 @@ async function checkForUpdatesExplicit(file: string) {
 //
 function updateView(potential_vulnerabilities: PotentialVulnerabilities.PotentialVulnerability[], 
 					confirmed_vulnerabilities: PotentialVulnerabilities.PotentialVulnerability[],
+					policy_violations: PolicyViolations.PolicyViolation[],
 					file: string[]): void {
+	var outputChannel = vscode.window.createOutputChannel('Ochrona')
+	outputChannel.show()
+	outputChannel.appendLine('Ochrona Dependency Scan');
+	outputChannel.appendLine(`\nFiles Scanned: \n\t${file.join('\n\t')}` );
+	outputChannel.appendLine('Scan Time: \n\t' + Date());
 	if ((potential_vulnerabilities && potential_vulnerabilities.length > 0) || (confirmed_vulnerabilities && confirmed_vulnerabilities.length > 0)) {
-		notify(potential_vulnerabilities, confirmed_vulnerabilities, file);
-		var outputChannel = vscode.window.createOutputChannel('Ochrona')
-		outputChannel.show()
-		outputChannel.appendLine('Ochrona Dependency Scan');
-		outputChannel.appendLine(`\nFiles Scanned: \n\t${file.join('\n\t')}` );
-		outputChannel.appendLine('Scan Time: \n\t' + Date());
+		notifyVuln(potential_vulnerabilities, confirmed_vulnerabilities, file);		
 		if (confirmed_vulnerabilities.length > 0) {
 			outputChannel.appendLine(`\nDiscovered ${confirmed_vulnerabilities.length} confirmed vulnerabilities.\n`);
 			confirmed_vulnerabilities.forEach((vuln: any) => {
@@ -281,6 +293,18 @@ function updateView(potential_vulnerabilities: PotentialVulnerabilities.Potentia
 				outputChannel.appendLine(`\n`);
 			});
 		}
+	}
+	if (policy_violations.length > 0) {
+		notifyPolicy(policy_violations, file);
+		console.log(policy_violations);
+		outputChannel.show()
+		outputChannel.appendLine(`\nDiscovered ${policy_violations.length} policy violations.\n`);
+		policy_violations.forEach((violation: PolicyViolations.PolicyViolation) => {
+			outputChannel.appendLine(`\tPolicy - ${violation.friendly_policy_type}`);
+			outputChannel.appendLine(`\t	${violation.message}`);
+			outputChannel.appendLine(`\t-------------------------------------------------------`);
+			outputChannel.appendLine(`\n`);
+		});
 	}
 	updateStatusBarItem(potential_vulnerabilities.concat(confirmed_vulnerabilities).length);
 }

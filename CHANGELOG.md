@@ -1,5 +1,8 @@
 # Change Log
 
+## [0.3.0]
+- Added Policy support
+
 ## [0.2.1]
 - Documentation updates
 

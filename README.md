@@ -46,6 +46,9 @@ To set this open the VS Code Settings (Code -> Preferences -> Settings) or (`CMD
 
 ## Release Notes
 
+## [0.3.0]
+- Added Policy support
+
 ## [0.2.1]
 - Documentation updates
 
